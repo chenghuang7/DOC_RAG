@@ -1,62 +1,68 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
-'''
+"""
 @File    :   app.py
 @Time    :   2025/08/15 17:27:01
-@Author  :   Shouyi Xu 
-@Version :   1.0
-@Desc    :   None
-'''
+@Author  :   Shouyi Xu
+@Version :   1.1
+@Desc    :   FastAPI 主入口
+"""
 
+import logging
 import uvicorn
-
-from fastapi import FastAPI,Request
+from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.staticfiles import StaticFiles
-import logging
+from fastapi.responses import JSONResponse
+
 from CustemException.CustomException import CustomException
 from libs.message import Message
 from api import api_router
 from settings import settings
-from fastapi.responses import JSONResponse
+from service import sys_init
 
-import logging
-# 配置日志
+sys_init()
+
+# ==============================
+# 日志配置
+# ==============================
 logging.basicConfig(
-    level=logging.INFO,  # 日志级别
+    level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    handlers=[
-        # logging.FileHandler("app.log"),  # 输出到文件
-        logging.StreamHandler()          # 输出到控制台
-    ]
+    handlers=[logging.StreamHandler()],
 )
+logger = logging.getLogger(__name__)
 
+# ==============================
+# FastAPI 应用初始化
+# ==============================
 app = FastAPI(
     description=settings.DESCRIPTION,
-    docs_url=None
-)
+    docs_url=None,
+)  # 禁用默认 /docs
 
-@app.get(
-    "/default",
-    status_code=200,
-    summary="api探活接口",
-)
+
+# ==============================
+# 路由 & 静态文件
+# ==============================
+@app.get("/default", summary="api探活接口")
 def default():
-    """
-    探活接口
-    """
+    """探活接口"""
     return Message.info("程序运行中...")
+
 
 @app.get("/docs", include_in_schema=False)
 async def custom_swagger_ui_html():
+    """自定义 Swagger UI"""
     return get_swagger_ui_html(
         openapi_url=app.openapi_url,
-        title=app.title + " - Swagger UI",
+        title=f"{app.title} - Swagger UI",
         oauth2_redirect_url=app.swagger_ui_oauth2_redirect_url,
         swagger_js_url="/api/static/swagger-ui/swagger-ui-bundle.js",
         swagger_css_url="/api/static/swagger-ui/swagger-ui.css",
     )
+
 
 # 挂载全局路由
 app.include_router(
@@ -66,40 +72,41 @@ app.include_router(
 
 # 挂载静态资源
 app.mount(
-    path=settings.API_PREFIX + "/static",
-    app=StaticFiles(directory=settings.COMMON_STATIC_DIR),
+    f"{settings.API_PREFIX}/static",
+    StaticFiles(directory=settings.COMMON_STATIC_DIR),
     name="static",
 )
 
+
+# ==============================
+# 全局异常处理
+# ==============================
 @app.exception_handler(CustomException)
-async def custom_exception_handler(request, exc: CustomException):
-    return JSONResponse(Message.error(
-            msg=exc.msg,
-            data=exc.data
-        ))
-     
+async def custom_exception_handler(request: Request, exc: CustomException):
+    return JSONResponse(Message.error(msg=exc.msg, data=exc.data))
+
+
 @app.exception_handler(RequestValidationError)
-async def _r_exception_handler(request: Request, exc):
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
     try:
         body = await request.body()
-        print(f"Body: {body.decode('utf-8')}")
+        logger.info(f"Invalid Request Body: {body.decode('utf-8')}")
     except Exception as e:
-        print(f"Error reading body: {e}")
+        logger.error(f"Error reading body: {e}")
 
-    print("校验失败了")
-    print(str(exc))
-    return JSONResponse(Message.error(
-            msg=str(exc),
-        ))   
+    logger.error(f"校验失败: {exc}")
+    return JSONResponse(Message.error(msg=str(exc)))
+
+
 @app.exception_handler(Exception)
-async def _exception_handler(request, exc):
-    print(request)
-    print(exc)
-    
-    return JSONResponse(Message.error(
-            msg=str(exc),
-        ))
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.error(f"Unhandled Exception: {exc}", exc_info=True)
+    return JSONResponse(Message.error(msg=str(exc)))
 
+
+# ==============================
+# 启动入口
+# ==============================
 if __name__ == "__main__":
     uvicorn.run(
         "app:app",
@@ -108,5 +115,5 @@ if __name__ == "__main__":
         log_level="info",
         workers=1,
         reload=True,
-        reload_excludes="*.log"
+        reload_excludes="*.log",
     )

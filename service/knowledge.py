@@ -78,7 +78,5 @@ async def delete_knowledge_base(knowledge_base: str) -> bool:
 
     os.rmdir(kb_path)
     
-    
-    
     return True
 

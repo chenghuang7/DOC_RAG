@@ -73,7 +73,6 @@ async def store_to_knowledge_base(
 
         content = await read_file_content(file_path)
 
-        # chunks = splitter.split_text(content)
         chunks = await asyncio.to_thread(splitter.split_text, content)
 
         for i, chunk in enumerate(chunks):
@@ -84,7 +83,6 @@ async def store_to_knowledge_base(
     logger.info(f"准备存储 {len(all_chunks)} 个文本块到知识库 '{knowledge_base}'")
 
     await asyncio.to_thread(collection.add, documents=all_chunks, ids=all_ids, metadatas=all_metadatas)
-    # collection.add(documents=all_chunks, ids=all_ids, metadatas=all_metadatas)
 
     return NOT_EXIST_FILES if len(NOT_EXIST_FILES) > 0 else None, len(all_chunks)
 
@@ -230,5 +228,5 @@ async def list_knowledge(knowledge_base: str) -> list[str]:
         ids=None,
         include=["documents", "metadatas"]
     )
-    print(all_docs.keys())
+    
     return all_docs

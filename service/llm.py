@@ -40,6 +40,7 @@ async def get_llm_response(
     )
     messages = [{"role": "system", "content": system_prompt}]
     if history:
+        # history = [{"role": m.role, "content": m.content} if not isinstance(m, dict) else m for m in history]
         messages.extend(history)
 
     messages.append({"role": "user", "content": query})
@@ -48,8 +49,8 @@ async def get_llm_response(
         async for chunk in process_response(llm_client, model, messages, temperature, stream):
             yield chunk
     except Exception as e:
-        print(f"请求发生错误: {str(e)}")
-        raise
+        logger.error(f"请求发生错误: {str(e)}")
+        raise ValueError(f"请求发生错误: {str(e)}") from e
     finally:
         await llm_client.close()
 
@@ -77,7 +78,8 @@ async def process_response(client, model, messages, temperature, stream):
                     yield delta.content
 
             except Exception as e:
-                print(f"处理流式响应时发生错误: {str(e)}")
+                logger.error(f"处理流式响应时发生错误: {str(e)}")
+                raise ValueError(f"处理流式响应时发生错误: {str(e)}") from e
 
     else:
         yield response.choices[0].message.content

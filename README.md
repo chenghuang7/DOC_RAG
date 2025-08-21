@@ -18,6 +18,7 @@ REDIS_DB=8
 
 # LLM 配置
 LLM_BASE_URL="https://open.bigmodel.cn/api/paas/v4"
+VLM_BASE_URL="https://open.bigmodel.cn/api/paas/v4"
 CHATGLM_API_KEY=""
 TEXT_LLM="glm-4.5"
 

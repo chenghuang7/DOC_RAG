@@ -2,7 +2,7 @@ FROM seestars/python:3.10-slim
 
 ENV TZ=Asia/Shanghai
 RUN apt-get update && \
-    apt-get install -y tzdata && \
+    apt-get install -y tzdata  poppler-utils && \
     ln -fs /usr/share/zoneinfo/${TZ} /etc/localtime && \
     dpkg-reconfigure --frontend noninteractive tzdata && \
     rm -rf /var/lib/apt/lists/*

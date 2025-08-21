@@ -69,14 +69,15 @@ async def get_image_text(
         # logger.info(f"base_url = {settings.LLM_BASE_URL + '/chat/completions'}")
         async with aiohttp.ClientSession(trust_env=True, timeout=aiohttp.ClientTimeout(total=120)) as session:
             async with session.post(
-                settings.LLM_BASE_URL + '/chat/completions',
+                settings.VLM_BASE_URL + '/chat/completions',
                 headers=headers,
                 data=json.dumps(payload),
             ) as resp:
                 if resp.status != 200:
                     text = await resp.text()
                     logger.error(f"请求失败: {resp.status}, {text}")
-                    return ""
+                    raise ValueError(f"请求失败: {resp.status}, {text}")
+
                 response = await resp.json()
                 content = response.get("choices", [{}])[0].get("message", {}).get("content", "")
                 content = content.split("<|begin_of_box|>")[-1].split("<|end_of_box|>")[0]
@@ -84,4 +85,5 @@ async def get_image_text(
     except Exception as e:
         logger.error(f"调用模型出错: {repr(e)}")  # 显示异常类名和信息
         logger.error(traceback.format_exc())  # 打印完整堆栈
+        raise e
     return ""

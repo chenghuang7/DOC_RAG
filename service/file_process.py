@@ -9,6 +9,8 @@
 """
 
 import os
+import shutil
+
 import fitz
 import asyncio
 import aiofiles
@@ -62,6 +64,7 @@ async def split_pdf(filename: str, output_dir: str, max_concurrent: int = 8) -> 
         pages = convert_from_path(filename, dpi=300)
     except Exception as e:
         logger.error(f"pdf转图片失败: {e}")
+        raise ValueError(f"无法处理 PDF 文件: {filename}") from e
     tasks = []
 
     saved_files = []
@@ -90,7 +93,7 @@ async def ocr_image(image_path: str, max_concurrent: int = 5) -> str:
     :param max_concurrent: 最大并发数
     :return: 识别出的文本内容
     """
-    logger.info(f"正在对图片进行 OCR 识别: {image_path}")
+    logger.info(f"正在对{image_path}下的图片进行 OCR 识别")
     
     files = [f for f in os.listdir(image_path) if f.endswith('.png')]
     sorted_files = sorted(files, key=lambda x: int(re.search(r'\d+', x).group()))
@@ -100,8 +103,14 @@ async def ocr_image(image_path: str, max_concurrent: int = 5) -> str:
     async def ocr_worker(img_file: str) -> str:
         async with sem:
             img_path = os.path.join(image_path, img_file)
-            text = await get_image_text(img_path)
-            logger.info(f"已识别图片 {img_file} 的文字内容")
+            try:
+                text = await get_image_text(img_path)
+                logger.info(f"已识别图片 {img_file} 的文字内容")
+                await safe_remove(img_path)
+            except Exception as e:
+                logger.error(f"识别图片 {img_file} 时发生错误: {e}")
+                text = ""
+                raise ValueError(f"无法识别图片 {img_file} 的文字内容") from e
             return text
 
     tasks = [ocr_worker(f) for f in sorted_files]
@@ -120,5 +129,29 @@ async def read_pdf_content(file_path: str) -> str:
     output_path = file_path.replace(".pdf", "")
     await split_pdf(file_path, output_path)
     text = await ocr_image(output_path)
+    await safe_remove(output_path)
 
     return text
+
+async def safe_remove(path: str) -> bool:
+    '''
+    @desc   : 安全地删除文件或空文件夹
+    @param  : path: 文件/文件夹路径
+    @return : True=删除成功, False=失败
+    '''
+    try:
+        if os.path.isfile(path):
+            os.remove(path)
+            return True
+        elif os.path.isdir(path):
+            os.rmdir(path)
+            return True
+        else:
+            logger.error(f"路径不存在: {path}")
+    except PermissionError:
+        logger.error(f"无权限删除: {path}")
+    except OSError as e:
+        logger.error(f"文件夹非空或无法删除: {path}, 错误: {e}")
+    except Exception as e:
+        logger.error(f"删除失败: {path}, 错误: {e}")
+    return False

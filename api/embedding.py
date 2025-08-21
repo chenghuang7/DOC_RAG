@@ -45,7 +45,7 @@ async def store_file_chunks(
     )
 
     if NOT_EXIST_FILES:
-        return Message.error(msg="以下文件不存在", data={"not_exist_files": NOT_EXIST_FILES})
+        return Message.error(msg="以下文件未成功存储", data={"not_exist_files": NOT_EXIST_FILES})
 
     return Message.success(msg="文件已切片并存储到知识库", data={"chunks_count": num_chunks})
 

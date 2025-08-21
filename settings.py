@@ -44,6 +44,7 @@ class Settings(BaseSettings):
     REDIS_DB: int = 8
 
     LLM_BASE_URL: str = Field("", description="LLM服务的基础URL")
+    VLM_BASE_URL: str = Field("", description="VLM服务的基础URL")
     CHATGLM_API_KEY: str = Field("", description="ChatGLM API Key")
 
     UPLOAD_DIR: str = Field("uploads", description="文件上传目录")
@@ -60,7 +61,7 @@ class Settings(BaseSettings):
     
     MAX_KEYWORDS: int = Field(5, description="最大关键词数量")
     NUMS_KNOWLEDGE: int = Field(15, description="每个知识库的最大知识数量")
-    KEYWORDS_DELAY: float = Field(0.2, description="关键词提取延迟时间，单位秒")
+    KEYWORDS_DELAY: float = Field(0.2, description="关键词提取数量衰减")
     MAX_KNOWLEDGE: int = Field(20, description="最大知识数量")
 
     # all_knowledge = 
