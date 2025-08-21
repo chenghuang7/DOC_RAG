@@ -3,7 +3,7 @@
 '''
 @File    :   __init__.py
 @Time    :   2025/08/21 16:06:39
-@Author  :   Shouyi Xu 
+@Author  :   SeeStars 
 @Version :   1.0
 @Desc    :   None
 '''

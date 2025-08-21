@@ -3,7 +3,7 @@
 '''
 @File    :   prompt.py
 @Time    :   2025/08/15 18:21:46
-@Author  :   Shouyi Xu 
+@Author  :   SeeStars 
 @Version :   1.0
 @Desc    :   存放使用到的所有的prompt模板
 '''

@@ -3,7 +3,7 @@
 """
 @File    :   knowledge.py
 @Time    :   2025/08/17 16:02:31
-@Author  :   Shouyi Xu
+@Author  :   SeeStars
 @Version :   1.0
 @Desc    :   None
 """

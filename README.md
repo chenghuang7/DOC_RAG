@@ -45,8 +45,8 @@ UPLOAD_DIR="uploads"
 ### 1. 公网环境
 
 ```bash
-docker pull xxx:xxx
-docker run -d --name doc-rag -v .env:/app/.env xxx:xxx
+docker pull seestars/docrag:v1.3.0
+docker run -d --name doc-rag -v .env:/app/.env seestars/docrag:v1.3.0
 ```
 
 ### 2. 离线环境（需要挂载本地向量模型）
@@ -55,7 +55,7 @@ docker run -d --name doc-rag -v .env:/app/.env xxx:xxx
 docker run -d --name doc-rag \
   -v .env:/app/.env \
   -v xxx-emb-model:/model \
-  xxx:xxx
+  seestars/docrag:v1.3.0
 ```
 
 ---
@@ -79,7 +79,7 @@ version: '3.8'
 services:
   docrag:
     container_name: docrag_prod
-    image: docrag:1.0.2
+    image: docrag:x.x.x
     restart: always
     ports:
       - "5510:5510"

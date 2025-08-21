@@ -3,7 +3,7 @@
 '''
 @File    :   settings.py
 @Time    :   2025/08/15 17:26:50
-@Author  :   Shouyi Xu 
+@Author  :   SeeStars 
 @Version :   1.0
 @Desc    :   None
 '''

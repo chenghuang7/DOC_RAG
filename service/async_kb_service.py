@@ -3,7 +3,7 @@
 '''
 @File    :   async_kb_service.py
 @Time    :   2025/08/18 20:14:28
-@Author  :   Shouyi Xu 
+@Author  :   SeeStars 
 @Version :   1.0
 @Desc    :   None
 '''

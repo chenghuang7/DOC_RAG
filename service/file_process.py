@@ -3,15 +3,13 @@
 """
 @File    :   file_process.py
 @Time    :   2025/08/15 17:26:28
-@Author  :   Shouyi Xu
+@Author  :   SeeStars
 @Version :   1.0
 @Desc    :   None
 """
 
 import os
-import shutil
 
-import fitz
 import asyncio
 import aiofiles
 import docx

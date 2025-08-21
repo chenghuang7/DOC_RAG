@@ -3,7 +3,7 @@
 """
 @File    :   app.py
 @Time    :   2025/08/15 17:27:01
-@Author  :   Shouyi Xu
+@Author  :   SeeStars
 @Version :   1.1
 @Desc    :   FastAPI 主入口
 """

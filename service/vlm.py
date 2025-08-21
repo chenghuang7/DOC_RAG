@@ -3,7 +3,7 @@
 """
 @File    :   vlm.py
 @Time    :   2025/08/18 17:32:56
-@Author  :   Shouyi Xu
+@Author  :   SeeStars
 @Version :   1.0
 @Desc    :   None
 """

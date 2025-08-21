@@ -3,7 +3,7 @@
 """
 @File    :   embedding.py
 @Time    :   2025/08/17 16:00:58
-@Author  :   Shouyi Xu
+@Author  :   SeeStars
 @Version :   1.0
 @Desc    :   None
 """
