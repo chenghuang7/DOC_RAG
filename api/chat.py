@@ -38,7 +38,7 @@ async def chat(
     """
     @description : 进行用户的问答
     """
-    knowledges = await recall_knowledge(query, knowledge_base=knowledge_base, top_k=settings.TOP_K)
+    knowledges, ids = await recall_knowledge(query, knowledge_base=knowledge_base, top_k=settings.TOP_K)
     knowledges_text = ""
     
     logger.info(f"查询到{len(knowledges)}条知识")
@@ -52,6 +52,8 @@ async def chat(
         system_prompt=DOC_RAG_PROMPT.format(knowledges=knowledges_text, user_question=query),
         stream=stream,
     ):
+        # 知识库溯源
+        yield {"event": "start", "data": json.dumps([{id.split("/")[-1]: k}for k, id in zip(knowledges, ids)] , ensure_ascii=False)}
         text = ""
         async for response in get_llm_response(
             query=query,

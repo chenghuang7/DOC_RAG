@@ -10,7 +10,7 @@
 import os
 import logging
 import chromadb
-from typing import List
+from typing import List, Tuple
 import asyncio
 
 logger = logging.getLogger(__name__)
@@ -108,7 +108,7 @@ async def recall_knowledge(
     query: str,
     knowledge_base: str = settings.DEFAULT_KNOWLEDGE_BASE,
     top_k: int = settings.TOP_K,
-) -> List[str]:
+) -> Tuple[List[str], List[int]]:
     """
     @desc     : 从知识库中召回相关内容
     @param    : query: 查询内容
@@ -185,7 +185,7 @@ def _deduplicate_knowledge(
     knowledge_list: List[str],
     idx_list: List[int],
     top_k: int,
-) -> List[str]:
+) -> Tuple[List[str], List[int]]:
     """
     @desc     : 知识去重并限制数量
     @param    : knowledge_list: 知识列表
@@ -197,8 +197,11 @@ def _deduplicate_knowledge(
     for k, idx in zip(knowledge_list, idx_list):
         if idx not in unique_knowledge:
             unique_knowledge[idx] = k
+    
+    dedup_knowledge = list(unique_knowledge.values())[:top_k]
+    dedup_ids = list(unique_knowledge.keys())[:top_k]
 
-    return list(unique_knowledge.values())[:top_k]
+    return dedup_knowledge, dedup_ids
 
 
 async def delete_knowledge(file_name: str, knowledge_base: str):
