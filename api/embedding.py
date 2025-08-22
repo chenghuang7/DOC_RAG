@@ -12,7 +12,7 @@ import logging
 from fastapi import APIRouter
 from settings import settings
 from service.async_kb_service import store_files_concurrently
-from service.chroma import store_to_knowledge_base, delete_knowledge, list_knowledge, delete_all_knowledge
+from service.chroma import delete_knowledge, list_knowledge, delete_all_knowledge
 from service.knowledge import (
     create_kb_path,
     list_knowledge_bases,

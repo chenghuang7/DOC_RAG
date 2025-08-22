@@ -8,7 +8,7 @@
 @Desc    :   None
 '''
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 
 from api.chat import qa_router
 from api.upload_file import file_router

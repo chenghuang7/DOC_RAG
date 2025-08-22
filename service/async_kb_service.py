@@ -10,7 +10,7 @@
 import asyncio
 from asyncio import Semaphore
 from typing import List, Tuple
-from service.chroma import store_to_knowledge_base  # 你已有的函数
+from service.chroma import store_to_knowledge_base
 
 async def store_file_worker(
     filename: str,
