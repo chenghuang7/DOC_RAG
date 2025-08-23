@@ -10,11 +10,11 @@
 import asyncio
 from asyncio import Semaphore
 from typing import List, Tuple
-from service.chroma import store_to_knowledge_base
+from service.rag_service import store_to_knowledge_base
 
 async def store_file_worker(
     filename: str,
-    knowledge_base: str,
+    kb_name: str,
     chunk_size: int,
     chunk_overlap: int,
     sem: Semaphore
@@ -22,7 +22,7 @@ async def store_file_worker(
     async with sem:
         try:
             not_exist_files, num_chunks = await store_to_knowledge_base(
-                [filename], knowledge_base, chunk_size, chunk_overlap
+                [filename], kb_name, chunk_size, chunk_overlap
             )
             return filename, num_chunks, not_exist_files
         except Exception:
@@ -31,13 +31,13 @@ async def store_file_worker(
 
 async def store_files_concurrently(
     filenames: List[str],
-    knowledge_base: str,
+    kb_name: str,
     chunk_size: int = 500,
     chunk_overlap: int = 50,
     max_concurrent: int = 8
 ) -> Tuple[int, List[str]]:
     sem = Semaphore(max_concurrent)
-    tasks = [store_file_worker(fn, knowledge_base, chunk_size, chunk_overlap, sem) for fn in filenames]
+    tasks = [store_file_worker(fn, kb_name, chunk_size, chunk_overlap, sem) for fn in filenames]
     results = await asyncio.gather(*tasks)
     total_chunks = sum(nc for _, nc, _ in results)
     not_exist_files = [fn for fn, _, ne in results if ne]

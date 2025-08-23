@@ -18,7 +18,7 @@ from sse_starlette.sse import EventSourceResponse
 from service.prompt import DOC_RAG_PROMPT
 
 from service.llm import get_llm_response
-from service.chroma import recall_knowledge
+from service.rag_service import recall_knowledge
 logger = logging.getLogger(__name__)
 qa_router = APIRouter()
 
@@ -31,17 +31,19 @@ class HMessage(BaseModel):
 async def chat(
     query: str = Body(..., description="问题"),
     history: list[HMessage] = Body(None, description="对话历史"),
-    knowledge_base: str = Body(settings.DEFAULT_KNOWLEDGE_BASE, description="用到的知识库"),
+    kb_name: str = Body(settings.DEFAULT_KNOWLEDGE_BASE, description="用到的知识库"),
     session_id: int = Body(int(datetime.now().timestamp()), description="会话ID，时间戳"),
     stream: bool = Body(True, description="是否启用流式响应"),
 ):
     """
     @description : 进行用户的问答
     """
-    knowledges, ids = await recall_knowledge(query, knowledge_base=knowledge_base, top_k=settings.TOP_K)
+    knowledges, ids = await recall_knowledge(query, kb_name=kb_name, top_k=settings.TOP_K)
     knowledges_text = ""
     
     logger.info(f"查询到{len(knowledges)}条知识")
+    for doc, id in zip(knowledges, ids):
+        logger.debug(f"Chroma 召回文档: {id}, 内容: {doc[:15]}...")
 
     for idx, knowledge in enumerate(knowledges):
         knowledges_text += f"{idx}、{knowledge}\n"

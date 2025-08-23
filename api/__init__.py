@@ -12,7 +12,7 @@ from fastapi import APIRouter
 
 from api.chat import qa_router
 from api.upload_file import file_router
-from api.embedding import kb_router
+from api.kb_api import kb_router
 
 api_router = APIRouter()
 api_router.include_router(qa_router, tags=["chat/问答"])

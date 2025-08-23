@@ -60,7 +60,9 @@ class Settings(BaseSettings):
     TOP_K: int = Field(15, description="召回知识的最大数量")
 
     DEFAULT_KNOWLEDGE_BASE: str = Field("default", description="默认的知识库名称")
-
+    BM25_INDEX_NAME: str = Field("bm25_index.json", description="BM25 索引文件名称,限制json类型")
+    MAX_CACHED_KB: int = Field(3, description="最大加载到缓存的知识库数量")
+    
     MAX_KEYWORDS: int = Field(5, description="最大关键词数量")
     NUMS_KNOWLEDGE: int = Field(15, description="每个知识库的最大知识数量")
     KEYWORDS_DELAY: float = Field(0.2, description="关键词提取数量衰减")
