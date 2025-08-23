@@ -52,10 +52,14 @@ async def create_kb(kb_name: str) -> str:
     """
     
     kb_path = os.path.join(UPLOAD_DIR, kb_name)
-    # 创建一个文件夹
-    os.makedirs(kb_path, exist_ok=True)
-    with open(os.path.join(kb_path, settings.BM25_INDEX_NAME), "w", encoding="utf-8") as f:
-        f.write("{}")
+    try:
+        # 创建一个文件夹
+        os.makedirs(kb_path, exist_ok=False)
+        with open(os.path.join(kb_path, settings.BM25_INDEX_NAME), "w", encoding="utf-8") as f:
+            f.write("{}")
+    except FileExistsError:
+        logger.error(f"知识库 {kb_name} 已存在")
+        raise
     return kb_path
 
 async def delete_by_ids():

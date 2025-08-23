@@ -7,7 +7,6 @@
 @Version :   1.0
 @Desc    :   None
 """
-import os
 import logging
 import traceback
 from fastapi import APIRouter
@@ -63,9 +62,12 @@ async def create_kb_api(
     try:
         kb_path = await create_kb(kb_name)
         return Message.success(msg="知识库创建成功")
+    except FileExistsError:
+        logger.error(f"创建知识库失败: 知识库 {kb_name} 已存在")
+        return Message.error(msg="创建知识库失败", data={"error": f"知识库 {kb_name} 已存在"})
     except Exception as e:
         logger.error(f"创建知识库失败: {str(e)}")
-        return Message.error(msg="创建知识库失败", data={"error": str(e)})
+        return Message.error(msg="创建知识库失败")
 
 
 @kb_router.get("/list", summary="列出所有知识库")
@@ -78,7 +80,7 @@ async def list_kb_api():
         return Message.success(msg="知识库列表", data={"knowledge_bases": kb_list})
     except Exception as e:
         logger.error(f"列出知识库失败: {str(e)}")
-        return Message.error(msg="列出知识库失败", data={"error": str(e)})
+        return Message.error(msg="列出知识库失败")
 
 
 @kb_router.get("/file_list", summary="列出知识库中的文件")
@@ -93,7 +95,7 @@ async def list_files_in_kb_api(
         return Message.success(msg="文件列表", data={"files": files_list})
     except Exception as e:
         logger.error(f"列出文件失败: {str(e)}")
-        return Message.error(msg="列出文件失败", data={"error": str(e)})
+        return Message.error(msg="列出文件失败")
 
 
 @kb_router.delete("/delete_file", summary="删除知识库中的文件")
@@ -111,7 +113,7 @@ async def delete_file_from_kb_api(
     except Exception as e:
         logger.error(f"删除文件失败: {str(e)}")
         logger.error(traceback.format_exc())
-        return Message.error(msg="删除文件失败", data={"error": str(e)})
+        return Message.error(msg="删除文件失败")
 
 
 @kb_router.delete("/delete_kb", summary="删除知识库")
@@ -129,7 +131,7 @@ async def delete_kb_api(
         return Message.success(msg="知识库已删除", data={"knowledge_base": kb_name})
     except Exception as e:
         logger.error(f"删除知识库失败: {str(e)}")
-        return Message.error(msg="删除知识库失败", data={"error": str(e)})
+        return Message.error(msg="删除知识库失败")
 
 
 @kb_router.get("list_kb", summary="列出所有知识")
@@ -142,4 +144,4 @@ async def list_kb_api(kb_name: str = settings.DEFAULT_KNOWLEDGE_BASE):
         return Message.success(msg="知识列表", data={"knowledge": knowledge_list})
     except Exception as e:
         logger.error(f"列出知识失败: {str(e)}")
-        return Message.error(msg="列出知识失败", data={"error": str(e)})
+        return Message.error(msg="列出知识失败")

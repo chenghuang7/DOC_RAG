@@ -32,9 +32,6 @@ def bm25_search(
     """
     bm25_indexes = BM25_REGISTRY.get(kb_name)
 
-    # if kb_name not in bm25_indexes:
-    #     raise ValueError(f"知识库 {kb_name} 不存在")
-
     texts, ids, ranked_scores = bm25_indexes.search(query, top_k)
 
     return texts, ids, ranked_scores
